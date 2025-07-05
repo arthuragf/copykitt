@@ -1,33 +1,46 @@
 from google import genai
+import os
 from google.genai import types
 from dotenv import load_dotenv
+from typing import List
 import argparse
 import json
 load_dotenv()
+
+MAX_USER_INPUT_LENGTH = os.getenv('USER_INPUT_MAX_LENGTH', 50)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", "-i", type=str, required=True)
     args = parser.parse_args()
     user_input = args.input
-    print(generate_branding_snippet(user_input))
-    print(generate_branding_keywords(user_input))
+    if validate_prompt_length(user_input):
+        generate_branding_snippet(user_input)
+        generate_branding_keywords(user_input)
+    else:
+        raise ValueError(f"Input length is too long. Must be lower than {MAX_USER_INPUT_LENGTH}")
+
+
+def validate_prompt_length(prompt:str) -> bool:
+    return len(prompt) <= MAX_USER_INPUT_LENGTH
 
 
 def generate_branding_snippet(prompt:str) -> str:
     enriched_prompt = f"Generate upbeat branding snippet for {prompt}"
     system_instructions = "return the result on the text key of the JSON"
     response = make_ai_request(enriched_prompt, system_instructions)
-    
-    return json.loads(response.text)["text"].strip()
+    response = json.loads(response.text)["text"].strip()
+    print(f"snippet: {response}")
+    return response
 
 
-def generate_branding_keywords(prompt:str) -> str:
-    enriched_prompt = (f"Generate key words for this branding: {prompt}")
+def generate_branding_keywords(prompt:str) -> List[str]:
+    enriched_prompt = f"Generate key words for this branding: {prompt}"
     system_instructions = "return the keywords separated by , on the keywords key of the JSON"
     response = make_ai_request(enriched_prompt, system_instructions)
-    
-    return json.loads(response.text)['keywords'].strip()
+    keywords = [keyword.lower() for keyword in json.loads(response.text)['keywords'].strip().split(",")]
+    print(f"keywords: {keywords}")
+    return keywords 
 
 
 def make_ai_request(prompt:str, system_instruction:str="") -> types.GenerateContentResponse:
