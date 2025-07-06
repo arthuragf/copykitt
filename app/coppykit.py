@@ -7,7 +7,7 @@ import argparse
 import json
 load_dotenv()
 
-MAX_USER_INPUT_LENGTH = os.getenv('USER_INPUT_MAX_LENGTH', 50)
+MAX_USER_INPUT_LENGTH = int(os.getenv('USER_INPUT_MAX_LENGTH', 50))
 
 def main():
     parser = argparse.ArgumentParser()
