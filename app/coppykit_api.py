@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MAX_USER_INPUT_LENGTH = int(os.getenv('USER_INPUT_MAX_LENGTH', 50))
+MAX_USER_INPUT_LENGTH = int(os.getenv('USER_INPUT_MAX_LENGTH', 32))
+MIN_USER_INPUT_LENGTH = int(os.getenv('USER_INPUT_MIN_LENGTH', 3))
+
 
 class BrandingResponse(BaseModel):
     snippet: Optional[str]
@@ -16,18 +18,36 @@ class BrandingResponse(BaseModel):
 
 app = FastAPI()
 
+
 @app.get("/generate_snippet", response_model=BrandingResponse)
-async def generate_snippet(prompt: Annotated[str, Query(..., max_length=32, min_length=3)]):
+async def generate_snippet(
+        prompt: Annotated[
+            str, 
+            Query(..., max_length=MAX_USER_INPUT_LENGTH, min_length=MIN_USER_INPUT_LENGTH)
+        ]
+):
     snippet = generate_branding_snippet(prompt)
     return {"snippet": snippet, "keywords": []}
 
+
 @app.get("/generate_keywords", response_model=BrandingResponse)
-async def generate_keywords(prompt: Annotated[str, Query(..., max_length=32, min_length=3)]):
+async def generate_keywords(
+        prompt: Annotated[
+            str, 
+            Query(..., max_length=MAX_USER_INPUT_LENGTH, min_length=MIN_USER_INPUT_LENGTH)
+        ]
+):
     keywords = generate_branding_keywords(prompt)
     return {"snippet": None, "keywords": keywords}
 
+
 @app.get("/generate_snippet_and_keywords", response_model=BrandingResponse)
-async def generate_snippet_and_keywords(prompt: Annotated[str, Query(..., max_length=32, min_length=3)]):
+async def generate_snippet_and_keywords(
+        prompt: Annotated[
+            str, 
+            Query(..., max_length=MAX_USER_INPUT_LENGTH, min_length=MIN_USER_INPUT_LENGTH)
+        ]
+):
     snippet = generate_branding_snippet(prompt)
     keywords = generate_branding_keywords(prompt)
     return {"snippet": snippet, "keywords": keywords}
