@@ -1,5 +1,9 @@
-from google import genai
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'package'))
+
+from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from typing import List

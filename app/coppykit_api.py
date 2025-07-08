@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Annotated
 import os
 from dotenv import load_dotenv
+from mangum import Mangum
 
 load_dotenv()
 
@@ -17,6 +18,7 @@ class BrandingResponse(BaseModel):
     
 
 app = FastAPI()
+handler = Mangum(app)
 
 
 @app.get("/generate_snippet", response_model=BrandingResponse)

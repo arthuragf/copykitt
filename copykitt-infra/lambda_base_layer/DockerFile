@@ -1,0 +1,20 @@
+FROM amazonlinux:2
+
+# Instala Python 3.7, pip e zip
+RUN yum install -y python37 python3-pip zip && \
+    yum clean all
+
+# Cria diretório para os pacotes da Lambda Layer
+WORKDIR /opt
+
+# Copia o requirements.txt
+COPY requirements.txt .
+
+# Instala dependências no formato que a Lambda espera
+RUN python3 -m pip install -r requirements.txt -t python
+
+# Compacta tudo em layer.zip
+RUN zip -r layer.zip python
+
+# Comando final apenas para manter o container “vivo” se for necessário
+CMD ["/bin/bash"]
