@@ -1,7 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda'
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+// Carrega as variáveis do arquivo .env
+dotenv.config({ path: path.resolve(__dirname, '../../app/.env') });
 
 export class CopykittInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -17,6 +21,9 @@ export class CopykittInfraStack extends cdk.Stack {
         code: lambda.Code.fromAsset("../app/"),
         handler: "coppykit_api.handler",   
         layers: [layer],
+        environment: {
+            "GEMINI_API_KEY": process.env.GEMINI_API_KEY || 'FALHOU',   
+        }
     })
   }
 }
